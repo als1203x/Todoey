@@ -7,12 +7,14 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class TodoListViewController: UITableViewController {
    
     //let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Item.plist")
-
+    
+    
+    
     var itemArray = [Item]()
     
     var selectedCategory: Category? {
@@ -21,8 +23,8 @@ class TodoListViewController: UITableViewController {
         }
     }
     
-    //Access Core Data Persistent Container
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        //Access Core Data Persistent Container
+        //let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     override func viewDidLoad() {
         super.viewDidLoad()

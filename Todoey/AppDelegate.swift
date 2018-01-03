@@ -24,10 +24,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         //initalzing a new realm
         do {
-            let realm = try Realm()
+            let _ = try Realm()
                 //commit to realm d
-            }
-        } catch {
+        }catch {
             print("Error initailzing Realm database: \(error)")
         }
        

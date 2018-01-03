@@ -29,16 +29,8 @@ class TodoListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-
-        
-        
         loadItems()
-        
-            //Load Data from UserDefaults
-       // if let items = defaults.array(forKey:"TodoListArray") as? [Item] {
-       //     itemArray = items
-       // }
-        
+  
     }
 
     //MARK - TableView DataSource MEthods
@@ -68,32 +60,18 @@ class TodoListViewController: UITableViewController {
     //MARK - TableViewDelegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-            //Update item - then save context  -- Core Data
-                // itemArray[indexPath.row].setValue("Completed", forKey: "title")
-     
+    
         //Update Realm .. w/ write
         if let item = items?[indexPath.row] {
             do  {
                 try realm.write {
                     item.done = !item.done
-                        //delete with realm .. w/ delete
-                        realm.delte(item)
                 }
             }catch  {
                 print("Error saving done status, \(error)")
             }
         }
-        
-        
-            //DeletingItem -- CoreData
-        //context.delete(itemArray[indexPath.row])
-        //itemArray.remove(at: indexPath.row)
-        
-        items[indexPath.row].done = !items[indexPath.row].done
-        
-        saveItems()
-        
-        //breif highlight when selected
+        tableView.reloadData()
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
@@ -109,13 +87,15 @@ class TodoListViewController: UITableViewController {
             //what will happen once the user clicks the "Add Item" button on UIAlert
         
             if textField.text != nil    {
-                //Saving Realm
+                //Creating - Saving Realm
                 
                 if let currentCategory = self.selectedCategory  {
+                        //Save Item
                     do  {
-                        try realm.write {
-                            newItem = Item()
+                        try self.realm.write {
+                            let newItem = Item()
                             newItem.title = textField.text!
+                                //
                             currentCategory.items.append(newItem)
                         }
                     }catch  {
@@ -135,30 +115,9 @@ class TodoListViewController: UITableViewController {
     
     //MARK: - Model Manupulation Methods
     
-    func saveItems()    {
-      
-       
-        self.tableView.reloadData()
-    }
-    
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil)    {
-      /*
-        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
-        
-        //allows for the use of multiple predicates
-        if let addtionalPredicate = predicate   {
-            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, addtionalPredicate])
-        }else{
-            request.predicate = categoryPredicate
-        }
-        
-        do{
-            itemArray = try context.fetch(request)
-        }catch  {
-            print("Error fetching data: \(error)")
-        }
-    */
-        itemArray = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
+    func loadItems()    {
+ 
+        items = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
         tableView.reloadData()
     }
 }
@@ -168,28 +127,19 @@ extension   TodoListViewController: UISearchBarDelegate {
 
     //MARK: - SearchBar Delegate method
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        //Query the database
-        let request: NSFetchRequest<Item> = Item.fetchRequest()
-            // format -- title = attribute in data to search, that CONTAINS, %@ is the args, which is replaced by the 2nd param
-            //Predicate specifics how data should be fetched -- using logical conditions
-            //add [c],[d], or [cd] after condition to ignore case, diacritic, or both
-        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        items = items?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "title", ascending: true)
         
-        // sort return data
-        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-
-       loadItems(with: request, predicate: predicate)
+        tableView.reloadData()
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchBar.text?.count == 0   {
             loadItems()
+            
             DispatchQueue.main.async {
                 searchBar.resignFirstResponder()
             }
             
         }
     }
-    
-    
 }

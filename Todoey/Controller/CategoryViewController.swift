@@ -42,7 +42,7 @@ class CategoryViewController: UITableViewController {
     //MARK: TableView Delegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        performSegue(withIdentifier: "GOTOSender", sender: self)
+        performSegue(withIdentifier: "GoToItems", sender: self)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -70,6 +70,7 @@ class CategoryViewController: UITableViewController {
                 //Add list to persistence list
                 self.saveCategory(category: newCategory)
             }
+            self.tableView.reloadData()
         }
         alert.addTextField  { (alertTextField)  in
             alertTextField.placeholder = "Create new category"
@@ -83,7 +84,7 @@ class CategoryViewController: UITableViewController {
     //MARK: Data Manipulation Mthods
     
     func saveCategory(category: Category)    {
-        
+            //commit changes to realm database
         do  {
             try realm.write {
                 realm.add(category)
@@ -91,19 +92,9 @@ class CategoryViewController: UITableViewController {
         }catch  {
             print("Error saving category: \(error)")
         }
-        //Reloads table with new data
-            //self.tableView.reloadData()  -- CoreData
     }
     
     func loadCatgories()    {
-      /*      let request : NSFetchRequest<Category> = Category.fetchRequest()
-            do{
-                try realm.
-                //categoryArray = try context.fetch(request)
-            }catch  {
-                print("Error fetching data: \(error)")
-            }
-             */
         categories = realm.objects(Category.self)
         tableView.reloadData()
     }

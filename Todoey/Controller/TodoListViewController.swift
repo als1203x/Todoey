@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+import SwipeCellKit
 
 class TodoListViewController: SwipeTableViewController {
     
@@ -25,7 +26,6 @@ class TodoListViewController: SwipeTableViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         loadItems()
-  
     }
 
     //MARK - TableView DataSource MEthods
@@ -73,7 +73,7 @@ class TodoListViewController: SwipeTableViewController {
         let action = UIAlertAction(title: "Add", style: .default)  { (action) in
             //what will happen once the user clicks the "Add Item" button on UIAlert
         
-            if textField.text != nil    {
+            if textField.text != ""    {
                 //Creating - Saving Realm
                 
                 if let currentCategory = self.selectedCategory  {
@@ -112,8 +112,8 @@ class TodoListViewController: SwipeTableViewController {
     
     override func updateModel(at indexPath: IndexPath) {
         do{
-            try self.realm.write {
-                self.realm.delete((self.items?[indexPath.row])!)
+            try realm.write {
+                realm.delete((items?[indexPath.row])!)
             }
         }catch  {
             print("Error deleting item: \(error)")
